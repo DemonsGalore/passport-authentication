@@ -53,22 +53,20 @@ passport.use(
     },
     (email, password, done) => {
       try {
-        User.findOne({ email: jwt_payload.id })
+        User.findOne({ email })
           .then(user => {
             if (!user) {
-              console.log("email not found");
               return done(null, false, { message: 'Email not registered' });
             } else {
               bcrypt.compare(password, user.password)
               .then(passwordMatch => {
                 if (passwordMatch) {
-                  console.log("user found & authenticated");
+                  // TODO: remove password from user before sending back (needed?)
                   return done(null, user)
                 } else {
-                  console.log("password does not match");
                   return done(null, false, { message: 'Wrong password' });
                 }
-              })
+              });
             }
           });
       } catch (error) {
@@ -79,24 +77,22 @@ passport.use(
 );
 
 const options = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+  // jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: keys.secret,
 };
 
 passport.use(
   'jwt',
-  new JWTStrategy(options, (jwt_payload, done) => {
+  new JWTStrategy(options, async (jwt_payload, done) => {
     try {
-      User.findById(jwt_payload.id)
-        .then(user => {
-          if (user) {
-            console.log("USER FOUND", user);
-            done(null, user);
-          } else {
-            console.log("USER NOT FOUND");
-            done(null, false);
-          }
-        });
+      const user = await User.findById(jwt_payload.id);
+      if (user) {
+        done(null, user);
+      } else {
+        // TODO: does this ever get called?
+        done(null, false);
+      }
     } catch (error) {
       done(error);
     }

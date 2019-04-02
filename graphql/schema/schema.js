@@ -19,9 +19,10 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLID },
     username: { type: GraphQLString },
     email: { type: GraphQLString },
-    password: { type: GraphQLString },
     firstname: { type: GraphQLString },
     lastname: { type: GraphQLString },
+    role: { type: GraphQLString },
+    // INFO: never add password here!
   })
 });
 
@@ -52,45 +53,10 @@ const RootQuery = new GraphQLObjectType({
         return User.find({});
       }
     },
-    login: {
-      type: AuthDataType,
-      args: {
-        email: { type: GraphQLString },
-        password: { type: GraphQLString },
-      },
-      async resolve(parent, args) {
-        const { email, password } = args;
-
-
-
-        //
-        // try {
-        //   const user = await User.findOne({ email });
-        //   if (!user) {
-        //     throw new Error('User does not exist!');
-        //   }
-        //   const isEqual = await bcrypt.compare(password, user.password);
-        //   if (!isEqual) {
-        //     throw new Error('Password is incorrect!');
-        //   }
-        //   const token = jwt.sign(
-        //     { userId: user.id, email: user.email },
-        //     'supersecretkey',
-        //     { expiresIn: '1h' }
-        //   );
-        //   return {
-        //     userId: user.id,
-        //     token,
-        //     tokenExpiration: 1,
-        //   };
-        // } catch (error) {
-        //   throw error;
-        // }
-      }
-    }
   }
 });
 
+// TODO: remove all(?) user functions from GraphQL-API or add authentication
 const RootMutation = new GraphQLObjectType({
   name: 'RootMutationType',
   fields: {
