@@ -28,7 +28,7 @@ require('./config/passport');
 
 // passport middleware
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session()); // TODO: needed?
 
 // routes
 app.use('/', require('./routes/index.js'));
@@ -36,8 +36,10 @@ app.use('/', require('./routes/dashboard.js'));
 app.use('/api/auth', auth);
 
 // db config
-const db_name = 'passport-authentication';
-const db = 'mongodb://localhost:27017/' + db_name;
+// const db = require('./config/keys').mongoURI;
+const db = process.env.mongoURI;
+// const db_name = 'passport-authentication';
+// const db = 'mongodb://localhost:27017/' + db_name;
 
 // connect to mongoDB
 mongoose

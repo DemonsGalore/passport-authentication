@@ -44,7 +44,6 @@ router.post('/register', (req, res, next) => {
 // @access      public
 router.post('/login', (req, res, next) => {
   passport.authenticate('login', (error, user, info) => {
-    console.log(user);
     if (error) console.log(error);
     if (info !== undefined) {
       res.status(403).send(info.message);
