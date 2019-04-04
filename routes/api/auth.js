@@ -65,16 +65,33 @@ router.post('/login', (req, res, next) => {
               expiresIn: '2w', // examples: 30s, 15m, 12h, 30d, 2w, 1y
             };
 
-            const token = jwt.sign(
+            jwt.sign(
               jwtPayload,
               keys.secret,
               jwtOptions,
               (error, token) => {
-                res.status(200).send({
-                  auth: true,
-                  token: 'Bearer ' + token,
-                  message: 'user found & logged in'
-                });
+                // TODO: check what is needed; only set one token (Bearer)
+                res.status(200)
+                  .set({
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    'Access-Control-Allow-Credentials': 'true'
+                  })
+                  // TODO: expires needed? token has own expiration date/time
+                  .cookie('Authorization', 'Bearer ' + token, {
+                    expires: new Date(Date.now() + 1209600000),
+                    httpOnly: true,
+                    secure: true,
+                  })
+                  .cookie('jwt', token, {
+                    expires: new Date(Date.now() + 1209600000),
+                    httpOnly: false,
+                    secure: false,
+                  })
+                  .send({
+                    auth: true,
+                    token: 'Bearer ' + token, // TODO: remove token from response?
+                    message: 'user found & logged in'
+                  });
               }
             );
           });
@@ -83,6 +100,25 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
+// TODO: passport.authenticate jwt first? check if logged in at all
+// @route       GET api/auth/signout
+// @description sign out user / delete JWT token cookie on client
+// @access      public
+router.post('/logout', (req, res, next) => {
+  res.status(200)
+    // TODO: expires needed? token has own expiration date/time
+    .cookie('jwt', '', {
+      expires: new Date(Date.now()),
+      httpOnly: false,
+      secure: false,
+    })
+    .send({
+      auth: false,
+      message: 'user signed out'
+    });
+});
+
+// TODO: only for testing
 // @route       GET api/auth/users
 // @description get all users with authentication
 // @access      private

@@ -3,6 +3,7 @@ const graphqlHTTP = require('express-graphql');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const auth = require('./routes/api/auth');
 
@@ -11,11 +12,25 @@ const schema = require('./graphql/schema/schema');
 const app = express();
 
 // allow cross-origin
-app.use(cors());
+app.use(cors({
+  origin: require('./config/keys').origin,
+  credentials: true
+}));
 
 // express body-parser middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// passport config
+require('./config/passport');
+
+// passport middleware
+app.use(passport.initialize());
+app.use(passport.session()); // TODO: needed?
+
+// cookie parser middleware
+// TODO: research cookieSecret
+app.use(cookieParser(require('./config/keys').cookieSecret));
 
 // graphQL initialization
 app.use('/graphql', graphqlHTTP({
@@ -23,23 +38,17 @@ app.use('/graphql', graphqlHTTP({
   graphiql: true
 }));
 
-// passport config
-require('./config/passport');
-
-// passport middleware
-app.use(passport.initialize());
-// app.use(passport.session()); // TODO: needed?
-
 // routes
-app.use('/', require('./routes/index.js'));
-app.use('/', require('./routes/dashboard.js'));
 app.use('/api/auth', auth);
 
 // db config
+// MongoDB Atlas
 // const db = require('./config/keys').mongoURI;
-const db = process.env.mongoURI;
-// const db_name = 'passport-authentication';
-// const db = 'mongodb://localhost:27017/' + db_name;
+// for deployment
+// const db = process.env.mongoURI;
+// local db
+const db_name = 'passport-authentication';
+const db = 'mongodb://localhost:27017/' + db_name;
 
 // connect to mongoDB
 mongoose

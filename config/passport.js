@@ -76,9 +76,19 @@ passport.use(
   )
 );
 
+// TODO: temporary solution
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies['jwt'];
+  }
+  return token;
+};
+
+// TODO: use fromAuthHeaderAsBearerToken; not working at the moment :(
 const options = {
-  // jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: cookieExtractor,
   secretOrKey: keys.secret,
 };
 
