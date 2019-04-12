@@ -16,7 +16,7 @@ signInButton.addEventListener('click', async (e) => {
 
   // const url = 'http://localhost:4000/graphql';
   // const url = 'https://backend-only.herokuapp.com/graphql';
-  const url = 'http://localhost:5555/api/auth/login';
+  const url = 'http://localhost:4000/api/auth/login';
   // const url = 'https://demons-auth.herokuapp.com/api/auth/login';
 
   const loginData = getCredentials(emailField.value, passwordField.value);
@@ -51,7 +51,7 @@ signInButton.addEventListener('click', async (e) => {
 });
 
 signOutButton.addEventListener('click', async () => {
-  const url = 'http://localhost:5555/api/auth/logout';
+  const url = 'http://localhost:4000/api/auth/logout';
   const fetchParams = {
     method: 'POST',
     credentials: 'include'
@@ -72,7 +72,7 @@ signOutButton.addEventListener('click', async () => {
 });
 
 getUsersButton.addEventListener('click', async () => {
-  const url = 'http://localhost:5555/api/auth/users';
+  const url = 'http://localhost:4000/api/auth/users';
   const fetchParams = {
     method: 'GET',
     headers: {
@@ -83,6 +83,8 @@ getUsersButton.addEventListener('click', async () => {
     },
     credentials: 'include'
   };
+
+  console.log(fetchParams);
 
   const response = async () => {
     try {
